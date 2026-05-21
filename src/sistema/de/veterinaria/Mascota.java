@@ -10,7 +10,7 @@ public class Mascota {
   private int Tamaño;
   private String Color;
   private int FechaNacimiento;
-//proceso
+
     public Mascota() {
     }
 
