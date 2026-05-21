@@ -1,23 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+
 package sistema.de.veterinaria;
 
-/**
- *
- * @author usario1
- */
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+
+
 public class InterfazDeSistema extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(InterfazDeSistema.class.getName());
+    private ArrayList<Dueño> listaDueños = new ArrayList<>();
+private DefaultTableModel modeloTabla;
 
     /**
      * Creates new form InterfazDeSistema
      */
     public InterfazDeSistema() {
+        // Inicializar el modelo de la tabla aquí
+    String[] columnas = {"DNI Dueño", "Nombre Dueño", "Apellido", "Teléfono", "Nombre Mascota", "Especie", "Raza", "Edad", "Tamaño", "Color"};
+    modeloTabla = new javax.swing.table.DefaultTableModel(columnas, 0);
         initComponents();
-        
+        jTable1.setModel(modeloTabla);
     }
 
     /**
@@ -475,18 +478,103 @@ public class InterfazDeSistema extends javax.swing.JFrame {
     }//GEN-LAST:event_razaActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+       // 1. Obtener textos de los campos
+    String dniTxt = DNI.getText().trim();
+    String nombreDueño = nombre.getText().trim();
+    String apellidoDueño = apellido.getText().trim();
+    String direccionDueño = direccion.getText().trim();
+    String telefonoTxt = telefono.getText().trim();
+    
+    String nombreMascotaTxt = nombreMascota.getText().trim();
+    String especieTxt = especie.getText().trim();
+    String razaTxt = raza.getText().trim();
+    String edadString = edadPaciente.getText().trim();
+    String sexoTxt = sexo.getText().trim();
+    String tamanoTxt = tamano.getText().trim();
+    String colorTxt = color.getText().trim();
+    String fechaNac = fechaNacimiento.getText().trim();
+    
+    if (dniTxt.isEmpty() || nombreDueño.isEmpty() || telefonoTxt.isEmpty() 
+        || nombreMascotaTxt.isEmpty() || edadString.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos requeridos.");
+        return;
+    }
+    
+    try {
+        // 3. Conversiones numéricas
+        int dni = Integer.parseInt(dniTxt);
+        int telefono = Integer.parseInt(telefonoTxt);
+        int edad = Integer.parseInt(edadString);
+        int tamano = Integer.parseInt(tamanoTxt);
+        int fechaNacInt = Integer.parseInt(fechaNac);
+
+        // 4. CREAR EL OBJETO MASCOTA
+        Mascota nuevaMascota = new Mascota(
+            nombreMascotaTxt,  // NombreMascota
+            especieTxt,        // especie
+            razaTxt,          // Raza
+            edad,             // edad
+            sexoTxt,          // sexo
+            tamano,           // Tamaño
+            colorTxt,         // Color
+            fechaNacInt        // FechaNacimiento
+        );
+        
+        // 5. CREAR EL OBJETO DUEÑO Y RELACIONAR CON MASCOTA
+        Dueño nuevoDueño = new Dueño(
+            nombreDueño,      // Nombre
+            apellidoDueño,   // Apellido
+            direccionDueño,  // Direccion
+            dni,             // DNI
+            telefono         // telefono
+        );
+        
+        // ← IMPORTANTE: Relacionar la mascota con el dueño
+        nuevoDueño.agregarMascota(nuevaMascota);
+        
+        // 6. Guardar en la lista SOLO de dueños (que ya tiene las mascotas dentro)
+        listaDueños.add(nuevoDueño);
+        
+        // 7. Mostrar en la tabla
+        modeloTabla.addRow(new Object[]{
+            dni, 
+            nombreDueño, 
+            apellidoDueño, 
+            telefono, 
+            nombreMascotaTxt, 
+            especieTxt, 
+            razaTxt, 
+            edad, 
+            tamanoTxt, 
+            colorTxt
+        });
+        
+        // 8. Limpiar campos
+        DNI.setText(""); 
+        nombre.setText(""); 
+        apellido.setText(""); 
+        direccion.setText("");
+        nombreMascota.setText(""); 
+        especie.setText(""); 
+        raza.setText("");
+        edadPaciente.setText(""); 
+        sexo.setText("");
+        color.setText("");
+        fechaNacimiento.setText("");
+        
+        JOptionPane.showMessageDialog(this, "¡Registro exitoso!\n" 
+            + "Dueño: " + nombreDueño + "\n"
+            + "Mascota: " + nombreMascotaTxt);
+        
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(this, "Error: Verifique que DNI, Teléfono, Edad, Tamaño y Fecha sean números.");
+    } catch (Exception ex) {
+        JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
+    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Nimbus".equals(info.getName())) {
@@ -494,14 +582,15 @@ public class InterfazDeSistema extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            System.err.println("Error al cargar el diseño: " + ex.getMessage());
         }
-        //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new InterfazDeSistema().setVisible(true));
     }
+    
+   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField DNI;
